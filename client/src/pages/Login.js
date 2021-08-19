@@ -8,7 +8,7 @@ function Login(props) {
   const [formState, setFormState] = useState({ email: '', password: '' });
   const [login, { error }] = useMutation(LOGIN);
 
-  const handleFormSubmit = async (event) => {
+  const handleFormSubmit = async event => {
     event.preventDefault();
     try {
       const mutationResponse = await login({
@@ -21,7 +21,7 @@ function Login(props) {
     }
   };
 
-  const handleChange = (event) => {
+  const handleChange = event => {
     const { name, value } = event.target;
     setFormState({
       ...formState,

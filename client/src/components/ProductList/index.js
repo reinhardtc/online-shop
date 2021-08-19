@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
-import { useQuery } from '@apollo/client';
-
 import ProductItem from '../ProductItem';
+// import { useStoreContext } from '../../utils/GlobalState';
+import { useReduxStore } from '../../redux/store';
+import { UPDATE_PRODUCTS } from '../../utils/actions';
+import { useQuery } from '@apollo/client';
 import { QUERY_PRODUCTS } from '../../utils/queries';
+import { idbPromise } from '../../utils/helpers';
 import spinner from '../../assets/spinner.gif';
 
-import { useStoreContext } from '../../utils/GlobalState';
-import { UPDATE_PRODUCTS } from '../../utils/actions';
-
-function ProductList({}) {
-  const [state, dispatch] = useStoreContext();
+function ProductList() {
+  const { state, dispatch } = useReduxStore;
 
   const { currentCategory } = state;
 
@@ -21,8 +21,18 @@ function ProductList({}) {
         type: UPDATE_PRODUCTS,
         products: data.products,
       });
+      data.products.forEach(product => {
+        idbPromise('products', 'put', product);
+      });
+    } else if (!loading) {
+      idbPromise('products', 'get').then(products => {
+        dispatch({
+          type: UPDATE_PRODUCTS,
+          products: products,
+        });
+      });
     }
-  }, [data, dispatch]);
+  }, [data, loading, dispatch]);
 
   function filterProducts() {
     if (!currentCategory) {
